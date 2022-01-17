@@ -5,6 +5,7 @@ import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -23,9 +24,6 @@ public class RedTeleOp extends LinearOpMode {
     CarouselSpinner carouselSpinner;
     DcMotor carouselSpinnerMotor;
 
-    Lift lift;
-    DcMotor liftMotor;
-
     Arm arm;
     DcMotor armMotor;
     Servo handServo;
@@ -37,9 +35,6 @@ public class RedTeleOp extends LinearOpMode {
 
         carouselSpinnerMotor = (DcMotor) hardwareMap.get("carouselSpinner");
         carouselSpinner = new CarouselSpinner(carouselSpinnerMotor);
-
-        liftMotor = (DcMotor)hardwareMap.get("liftMotor");
-        lift = new Lift(liftMotor);
 
         armMotor = (DcMotor)hardwareMap.get("armMotor");
         handServo = (Servo)hardwareMap.get("handServo");
@@ -71,8 +66,6 @@ public class RedTeleOp extends LinearOpMode {
             }
 
             /* Controller 2 */
-
-
             if (gamepad2.left_trigger > 0){
                 arm.rotate(gamepad2.left_trigger, true);
             }
@@ -81,27 +74,6 @@ public class RedTeleOp extends LinearOpMode {
             }
             else {
                 arm.rotate(0.0, true);
-            }
-
-//            if (gamepad2.dpad_up){
-//                arm.move(Arm.HIGH_POSITION);
-//            }
-//            else if (gamepad2.dpad_left){
-//                arm.move(Arm.LOW_POSITION);
-//            }
-//            else if (gamepad2.dpad_right){
-//                arm.move(Arm.MID_POSITION);
-//            }
-//            else if (gamepad2.dpad_down){
-//                arm.move(Arm.GROUND);
-//            }
-
-
-            if (gamepad2.left_stick_y > 0){
-                lift.up(gamepad1.left_stick_y);
-            }
-            else if (gamepad2.left_stick_y < 0){
-                lift.down(-gamepad1.left_stick_y);
             }
 
             if (gamepad2.y){

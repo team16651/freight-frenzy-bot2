@@ -43,7 +43,7 @@ public class Arm {
 
     public void release(){
         handServo.setDirection(Servo.Direction.REVERSE);
-        handServo.setPosition(0.5);
+        handServo.setPosition(0.1);
     }
 
     public void move (int targetPosition){
@@ -58,11 +58,11 @@ public class Arm {
 
     public void rotate(double power, boolean up){
         if (up) {
-            armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+            armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             armMotor.setPower(power * MAX_ROTATION_SPEED);
         }
         else if (armTouchSensor.getState()){
-            armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
             armMotor.setPower(power * MAX_ROTATION_SPEED);
         }
         else {
