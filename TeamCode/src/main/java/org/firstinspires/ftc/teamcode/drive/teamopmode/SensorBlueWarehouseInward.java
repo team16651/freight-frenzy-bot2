@@ -22,7 +22,7 @@ public class SensorBlueWarehouseInward extends SensorBlueWarehouseOutward {
     protected void runAutonomous(SampleMecanumDrive drive, Arm arm, ShippingElementDetector shippingElementDetector){
         super.runAutonomous(drive, arm, shippingElementDetector);
 
-        Vector2d parkingPose = new Vector2d(44.698, -29.580);
+        Vector2d parkingPose = new Vector2d(29.580, 44.698);
 
         Trajectory trajectoryWarehouseToParking = drive.trajectoryBuilder(trajectoryHomeToWarehouse.end())
                 .strafeTo(parkingPose)

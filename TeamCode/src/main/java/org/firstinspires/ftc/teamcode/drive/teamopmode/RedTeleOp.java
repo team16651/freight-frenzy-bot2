@@ -28,6 +28,7 @@ public class RedTeleOp extends LinearOpMode {
     DcMotor armMotor;
     Servo handServo;
     DigitalChannel armTouchSensor;
+    Servo cappingServo;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -39,20 +40,31 @@ public class RedTeleOp extends LinearOpMode {
         armMotor = (DcMotor)hardwareMap.get("armMotor");
         handServo = (Servo)hardwareMap.get("handServo");
         armTouchSensor = (DigitalChannel)hardwareMap.get("touch");
-        arm = new Arm(armMotor, handServo, armTouchSensor);
+        cappingServo = (Servo)hardwareMap.get("cappingServo");
+        arm = new Arm(armMotor, handServo, armTouchSensor, cappingServo);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         waitForStart();
 
+        cappingServo.setPosition(1);
+
         while (!isStopRequested()) {
+            double throttle = THROTTLE;
+            double strafeThrottle = STRAFE_THROTTLE;
+            double rotateThrottle = ROTATION_THROTTLE;
+            if (arm.isExtended()){
+                throttle = throttle/2;
+                strafeThrottle = strafeThrottle/2;
+                rotateThrottle = rotateThrottle/2;
+            }
 
             /* Controller 1 */
             drive.setWeightedDrivePower(
                     new Pose2d(
-                            -gamepad1.left_stick_y * THROTTLE,
-                            -gamepad1.left_stick_x * STRAFE_THROTTLE,
-                            -gamepad1.right_stick_x * ROTATION_THROTTLE
+                            -gamepad1.left_stick_y * throttle,
+                            -gamepad1.left_stick_x * strafeThrottle,
+                            -gamepad1.right_stick_x * rotateThrottle
                     )
             );
 
@@ -84,8 +96,17 @@ public class RedTeleOp extends LinearOpMode {
                 arm.grab();
             }
 
+            if (gamepad2.x){
+                arm.extend();
+            }
+
+            if (gamepad2.b){
+                arm.retract();
+            }
+
             telemetry.addData("arm motor position: ", armMotor.getCurrentPosition());
             telemetry.addData("servo position", handServo.getPosition());
+            telemetry.addData("capping servo position", cappingServo.getPosition());
             telemetry.update();
         }
     }

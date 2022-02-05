@@ -21,15 +21,15 @@ public class ShippingElementDetector {
         String results = NEITHER;
         double leftDistance = sensorDistanceLeft.getDistance(DistanceUnit.CM);
         double rightDistance = sensorDistanceRight.getDistance(DistanceUnit.CM);
-        if (leftDistance < 10 && rightDistance < 10){
+        if (leftDistance < 30 && rightDistance < 30){
             if (leftDistance < rightDistance){
                 results = LEFT;
             }else{
                 results = RIGHT;
             }
-        }else if(leftDistance<10){
+        }else if(leftDistance<30){
             results = LEFT;
-        }else if(rightDistance<10){
+        }else if(rightDistance<30){
             results = RIGHT;
         }
 

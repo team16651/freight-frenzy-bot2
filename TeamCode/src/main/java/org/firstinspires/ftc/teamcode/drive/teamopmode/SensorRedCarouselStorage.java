@@ -31,18 +31,23 @@ public class SensorRedCarouselStorage extends LinearOpMode {
     private DistanceSensor rightSensor = null;
 
     private Pose2d poseHome = new Pose2d(0, 0, 0);
-    private Pose2d poseCarousel = new Pose2d(-15,5.355,0);
-    private Pose2d poseDetectRandomization = new Pose2d(0.743,20.186,1.571);
-    private Pose2d poseShippingHub1 = new Pose2d(21.712, 9.811, 1.427);
-    private Pose2d poseShippingHub2 = new Pose2d(23.924, 22.819, 1.427);
-    private Pose2d poseStorage = new Pose2d(-21.066, 27.936, 0);
+    private Pose2d poseRunAway = new Pose2d(2, 0, 0);
+    private Pose2d poseDetectRandomization = new Pose2d(15,0,0);
+    private Pose2d poseShippingHub1 = new Pose2d(8.5, -20.08, 0);
+    private Pose2d poseShippingHub2 = new Pose2d(23.32, -20.08, 5.76);
+    private Pose2d poseCarousel1 = new Pose2d(8.5,0,0);
+    private Pose2d poseCarousel2 = new Pose2d(17.14, 24.05, 3.07);
+    private Pose2d poseCarousel3 = new Pose2d(9, 24.05, 3.07);
+    private Pose2d poseStorage = new Pose2d(34.17, 22.05, 3.07);
 
-    private Trajectory trajectoryHomeToCarouselSpinner = null;
-    private Trajectory trajectoryCarouselSpinnerToDetect = null;
+    private Trajectory trajectoryHomeToRunAway = null;
+    private Trajectory trajectoryRunAwayToDetect = null;
     private Trajectory trajectoryDetectToShippingHub1 = null;
     private Trajectory trajectoryShippingHub1ToShippingHub2 = null;
-    private Trajectory trajectoryShippingHub2ToShippingHub1 = null;
-    private Trajectory trajectoryShippingHub1ToStorage = null;
+    private Trajectory trajectoryShippingHub2ToCarousel1 = null;
+    private Trajectory trajectoryCarousel1ToCarousel2 = null;
+    private Trajectory trajectoryCarosoel2ToCarousel3 = null;
+    private Trajectory trajectoryCarousel3ToStorage = null;
 
     private int armPosition = Arm.MID_POSITION;
 
@@ -69,62 +74,57 @@ public class SensorRedCarouselStorage extends LinearOpMode {
     private void runAutonomous(SampleMecanumDrive drive, CarouselSpinner carouselSpinner, Arm arm, ShippingElementDetector shippingElementDetector) {
         arm.grab();
         sleep(1500);
-        arm.move(Arm.MID_POSITION);
-        driveToCarousel(drive);
-        spinCarousel(carouselSpinner);
-        driveToDetect(drive);
-        double yOffset = detectShippingElementAndReturnYOffset(shippingElementDetector);
-        driveToShippingHub(drive, arm, yOffset);
+
+
+        driveToDetect(drive, arm);
+        double xOffset = detectShippingElementAndReturnXOffset(shippingElementDetector);
+        driveToShippingHub(drive, arm, xOffset);
         arm.release();
         sleep(1000);
+        driveToCarousel(drive, arm);
+        spinCarousel(carouselSpinner);
         driveToPark(drive);
-        arm.move(Arm.PARK_POSITION);
     }
 
-    private void driveToCarousel(SampleMecanumDrive drive){
-        trajectoryHomeToCarouselSpinner = drive.trajectoryBuilder(poseHome)
-                .lineToLinearHeading(poseCarousel)
+
+
+    private void driveToDetect(SampleMecanumDrive drive, Arm arm){
+        trajectoryHomeToRunAway = drive.trajectoryBuilder(poseHome)
+                .lineToLinearHeading(poseRunAway)
                 .build();
-
-        drive.followTrajectory(trajectoryHomeToCarouselSpinner);
-    }
-
-    private void spinCarousel(CarouselSpinner carouselSpinner){
-        carouselSpinner.spin(true, 0.5);
-        this.sleep(2500);
-        carouselSpinner.stop();
-    }
-
-    private void driveToDetect(SampleMecanumDrive drive){
-        trajectoryCarouselSpinnerToDetect = drive.trajectoryBuilder(trajectoryHomeToCarouselSpinner.end())
-                .lineToLinearHeading(poseDetectRandomization)
-                .build();
-
-        drive.followTrajectory(trajectoryCarouselSpinnerToDetect);
-    }
-
-    private double detectShippingElementAndReturnYOffset(ShippingElementDetector shippingElementDetector){
-        String location = shippingElementDetector.detectPringle();
-        double yOffset = 0;
-
-        if (ShippingElementDetector.NEITHER.equals(location)){
-            armPosition = Arm.HIGH_POSITION;
-            yOffset = 2;
-        }
-        else if (ShippingElementDetector.LEFT.equals(location)){
-            armPosition = Arm.LOW_POSITION;
-        }
-
-        return yOffset;
-    }
-
-    private void driveToShippingHub(SampleMecanumDrive drive, Arm arm, double yOffset){
-        poseShippingHub2 = poseShippingHub2.plus(new Pose2d(0, yOffset, 0));
-
-        trajectoryDetectToShippingHub1 = drive.trajectoryBuilder(trajectoryCarouselSpinnerToDetect.end())
-                .lineToLinearHeading(poseShippingHub1,
+        trajectoryRunAwayToDetect = drive.trajectoryBuilder(poseRunAway)
+                .lineToLinearHeading(poseDetectRandomization,
                         SampleMecanumDrive.getVelocityConstraint(DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL/2))
+                .build();
+
+        drive.followTrajectory(trajectoryHomeToRunAway);
+        arm.move(Arm.MID_POSITION);
+        sleep(1000);
+        drive.followTrajectory(trajectoryRunAwayToDetect);
+    }
+
+    private double detectShippingElementAndReturnXOffset(ShippingElementDetector shippingElementDetector){
+        String location = shippingElementDetector.detectPringle();
+        double xOffset = 3.5;
+
+        if (ShippingElementDetector.LEFT.equals(location)){
+            armPosition = Arm.LOW_POSITION;
+            xOffset = 2;
+        }
+        else if (ShippingElementDetector.NEITHER.equals(location)){
+            armPosition = Arm.HIGH_POSITION;
+            xOffset = 5;
+        }
+
+        return xOffset;
+    }
+
+    private void driveToShippingHub(SampleMecanumDrive drive, Arm arm, double xOffset){
+        poseShippingHub2 = poseShippingHub2.plus(new Pose2d(xOffset, 0, 0));
+
+        trajectoryDetectToShippingHub1 = drive.trajectoryBuilder(trajectoryRunAwayToDetect.end())
+                .lineToLinearHeading(poseShippingHub1)
                 .build();
 
         trajectoryShippingHub1ToShippingHub2 = drive.trajectoryBuilder(trajectoryDetectToShippingHub1.end())
@@ -135,19 +135,44 @@ public class SensorRedCarouselStorage extends LinearOpMode {
 
         arm.move(armPosition);
 
+        sleep(1000);
+
         drive.followTrajectory(trajectoryShippingHub1ToShippingHub2);
     }
 
-    private void driveToPark(SampleMecanumDrive drive){
-        trajectoryShippingHub2ToShippingHub1 = drive.trajectoryBuilder(trajectoryShippingHub1ToShippingHub2.end())
-                .lineToLinearHeading(poseShippingHub1)
+    private void driveToCarousel(SampleMecanumDrive drive, Arm arm){
+        trajectoryShippingHub2ToCarousel1 = drive.trajectoryBuilder(trajectoryShippingHub1ToShippingHub2.end())
+                .lineToLinearHeading(poseCarousel1)
                 .build();
 
-        trajectoryShippingHub1ToStorage = drive.trajectoryBuilder(trajectoryShippingHub2ToShippingHub1.end())
+        trajectoryCarousel1ToCarousel2 = drive.trajectoryBuilder(trajectoryShippingHub2ToCarousel1.end())
+                .lineToLinearHeading(poseCarousel2)
+                .build();
+
+        trajectoryCarosoel2ToCarousel3 = drive.trajectoryBuilder(trajectoryCarousel1ToCarousel2.end())
+                .lineToLinearHeading(poseCarousel3,
+                        SampleMecanumDrive.getVelocityConstraint(DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL/2))
+                .build();
+
+        drive.followTrajectory(trajectoryShippingHub2ToCarousel1);
+        arm.grab();
+        arm.move(Arm.PARK_POSITION);
+        drive.followTrajectory(trajectoryCarousel1ToCarousel2);
+        drive.followTrajectory(trajectoryCarosoel2ToCarousel3);
+    }
+
+    private void spinCarousel(CarouselSpinner carouselSpinner){
+        carouselSpinner.spin(true, 0.4);
+        this.sleep(3000);
+        carouselSpinner.stop();
+    }
+
+    private void driveToPark(SampleMecanumDrive drive){
+        trajectoryCarousel3ToStorage = drive.trajectoryBuilder(trajectoryCarosoel2ToCarousel3.end())
                 .lineToLinearHeading(poseStorage)
                 .build();
 
-        drive.followTrajectory(trajectoryShippingHub2ToShippingHub1);
-        drive.followTrajectory(trajectoryShippingHub1ToStorage);
+        drive.followTrajectory(trajectoryCarousel3ToStorage);
     }
 }
