@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.hardware.Arm;
 import org.firstinspires.ftc.teamcode.hardware.ShippingElementDetector;
@@ -27,7 +28,7 @@ public class SensorBlueWarehouseOutward extends LinearOpMode {
 
     private Pose2d poseHome = new Pose2d(0, 0, 0);
     private Pose2d poseRunAway = new Pose2d(2, 0, 0);
-    private Pose2d poseDetectRandomization = new Pose2d(20.68,0,0);
+    private Pose2d poseDetectRandomization = new Pose2d(13,0,0);
     private Pose2d poseShippingHub1 = new Pose2d(10, -5.54, 0);
     private Pose2d poseShippingHub2 = new Pose2d(25.81, -9.13, 5.76);
     private Pose2d poseHome2 = new Pose2d(0,0,1.57);
@@ -67,7 +68,6 @@ public class SensorBlueWarehouseOutward extends LinearOpMode {
         driveToHome(drive);
         driveToWarehouse(drive);
         arm.move(Arm.PARK_POSITION);
-        sleep(1000);
     }
 
     private void driveToDetect(SampleMecanumDrive drive, Arm arm){
@@ -76,11 +76,14 @@ public class SensorBlueWarehouseOutward extends LinearOpMode {
                 .build();
 
         trajectoryRunAwayToDetect = drive.trajectoryBuilder(poseRunAway)
-                .lineToLinearHeading(poseDetectRandomization)
+                .lineToLinearHeading(poseDetectRandomization,
+                        SampleMecanumDrive.getVelocityConstraint(DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL/2))
                 .build();
 
         drive.followTrajectory(trajectoryHomeToRunAway);
         arm.move(Arm.MID_POSITION);
+        sleep(1000);
         drive.followTrajectory(trajectoryRunAwayToDetect);
     }
 
@@ -109,7 +112,9 @@ public class SensorBlueWarehouseOutward extends LinearOpMode {
                 .build();
 
         trajectoryShippingHub1ToShippingHub2 = drive.trajectoryBuilder(trajectoryDetectToShippingHub1.end())
-                .lineToLinearHeading(poseShippingHub2)
+                .lineToLinearHeading(poseShippingHub2,
+                        SampleMecanumDrive.getVelocityConstraint(DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL/2))
                 .build();
 
         drive.followTrajectory(trajectoryDetectToShippingHub1);
@@ -118,7 +123,9 @@ public class SensorBlueWarehouseOutward extends LinearOpMode {
 
     private void driveToHome(SampleMecanumDrive drive){
         trajectoryShippingHub2ToHome2 = drive.trajectoryBuilder(trajectoryShippingHub1ToShippingHub2.end())
-                .lineToLinearHeading(poseHome2)
+                .lineToLinearHeading(poseHome2,
+                        SampleMecanumDrive.getVelocityConstraint(DriveConstants.MAX_VEL, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL/2))
                 .build();
 
         drive.followTrajectory(trajectoryShippingHub2ToHome2);

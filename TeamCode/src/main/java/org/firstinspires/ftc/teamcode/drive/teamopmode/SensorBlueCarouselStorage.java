@@ -75,7 +75,6 @@ public class SensorBlueCarouselStorage extends LinearOpMode {
         arm.grab();
         sleep(1500);
 
-
         driveToDetect(drive, arm);
         double xOffset = detectShippingElementAndReturnXOffset(shippingElementDetector);
         driveToShippingHub(drive, arm, xOffset);
