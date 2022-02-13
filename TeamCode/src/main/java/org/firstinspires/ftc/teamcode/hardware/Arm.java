@@ -17,7 +17,7 @@ public class Arm {
     public static final int GROUND = 0;
     public static final int PARK_POSITION = -100;
     public static final int LOW_POSITION = -370;
-    public static final int MID_POSITION = -840;
+    public static final int MID_POSITION = -835;
     public static final int HIGH_POSITION = -1270;
 
     private static final double AUTONOMOUS_POWER = 0.25;

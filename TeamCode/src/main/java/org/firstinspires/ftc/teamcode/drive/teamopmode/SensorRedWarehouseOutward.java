@@ -32,7 +32,7 @@ public class SensorRedWarehouseOutward extends LinearOpMode {
     private Pose2d poseShippingHub1 = new Pose2d(10, 5.54, 0);
     private Pose2d poseShippingHub2 = new Pose2d(25.81, 9.13, 0.8);
     private Pose2d poseHome2 = new Pose2d(0,0,4.8);
-    private Pose2d poseWarehousePose = new Pose2d(0, -35, 4.8);
+    private Pose2d poseWarehousePose = new Pose2d(0, -30, 4.8);
 
     protected Trajectory trajectoryHomeToRunAway = null;
     protected Trajectory trajectoryRunAwayToDetect = null;

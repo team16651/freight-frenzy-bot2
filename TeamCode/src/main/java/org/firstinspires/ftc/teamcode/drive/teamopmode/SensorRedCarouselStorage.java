@@ -32,7 +32,7 @@ public class SensorRedCarouselStorage extends LinearOpMode {
 
     private Pose2d poseHome = new Pose2d(0, 0, 0);
     private Pose2d poseRunAway = new Pose2d(2, 0, 0);
-    private Pose2d poseDetectRandomization = new Pose2d(15,0,0);
+    private Pose2d poseDetectRandomization = new Pose2d(18,0,0);
     private Pose2d poseShippingHub1 = new Pose2d(8.5, -20.08, 0);
     private Pose2d poseShippingHub2 = new Pose2d(23.32, -20.08, 5.76);
     private Pose2d poseCarousel1 = new Pose2d(8.5,0,0);
